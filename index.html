@@ -1,0 +1,2561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0093)file:///D:/Downloads/Flutomat/NAFlutomat%20-%20Native%20American%20Flute%20Design%20Tool.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+ 
+<title>NAFlutomat - Native American Flute Design Tool</title>
+
+
+<meta name="description" content="Flutopedia.com is an Encyclopedia for the Native American flute.">
+<meta name="keywords" content="native american flute, native flute, NAF, love flute, courting flute, indian flute">
+<meta name="author" content="Clint Goss">
+ 
+<link rel="shortcut icon" href="https://www.flutopedia.com/favicon.ico" type="image/x-icon">
+
+<link rel="stylesheet" href="./NAFlutomat - Native American Flute Design Tool_files/flutopedia.css" type="text/css">
+<link rel="stylesheet" href="./NAFlutomat - Native American Flute Design Tool_files/flutopedia_rotate.css" type="text/css">
+
+
+<script type="text/javascript" async="" src="./NAFlutomat - Native American Flute Design Tool_files/ga.js.download"></script><script type="text/javascript" async="" src="./NAFlutomat - Native American Flute Design Tool_files/ga.js(1).download"></script><script type="text/javascript" src="./NAFlutomat - Native American Flute Design Tool_files/FPmenu.js.download"></script>
+<script type="text/javascript" src="./NAFlutomat - Native American Flute Design Tool_files/FPmenu_layout.js.download"></script>
+<script type="text/javascript" src="./NAFlutomat - Native American Flute Design Tool_files/FPmenu_geometry.js.download"></script>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-22345403-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body marginheight="0" marginwidth="0" topmargin="0" leftmargin="0" text="#000000">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" cols="2">
+  <tbody>
+  
+   <tr>
+     <td valign="top" height="99%">
+	  <table class="ContentBox" width="100%" cellspacing="0" cellpadding="0">
+	  <tbody>
+	  <tr>
+	  </tr>
+	  <tr><td>
+
+       
+      <h1 class="pageTitle">NAFlutomat - Native American Flute Design Tool</h1>
+
+      
+      
+      
+      
+
+
+
+
+  <script type="text/javascript">// Global variable definitions for flute calculations
+// inputs
+var TSHThicknessFactor;
+var BirdFactor;
+var FlueDepth;
+var FippleThickness;
+var holeCount=6;  // Number of flute finger holes
+
+// var English; Moved to AcousticCalcs.js
+
+var Df = new Array(10); // finger hole diameters as entered
+var Edf = new Array(10);  // hole diameters after hole correction
+var LDiff = new Array(10);
+var Lemb; // embouchure hole length
+var Wemb; // embouchure hole width
+var Bore;  //inside diameter of tube
+var Wall;  // wall thickness of tube
+var Vsound; // velocity of sound
+var Ff = new Array(10); // finger hole note frequencies
+var Fend; // all-holes-closed end-of-flute frequency
+var Xend; // effective location of end of flute
+var Xf = new Array(10);  // location of finger holes
+var Wf = new Array(10); // wall thickness at finger holes
+var PriorLength2; // length with hole 1 and 2 open
+var PriorLength3; // length with holes 1 -3 open
+var PriorDiff2; // length difference with hole 1 and 2 open
+var PriorDiff3; // length difference with holes 1 - 3 open
+var DirHoleWall; // wall thickness at direction holes 
+var Xemb; // location of embouchure
+var NumDirHoles;  // number of direction holes
+var UseDirHoles;  // use direction holes
+var DirHoleFreq;  // flute frequency before drilling direction holes, at playing condititons
+var DirHoleFreqTune;  // flute frequency before drilling direction holes, at tuning conditions
+var DirHoleDiam;  // diameter of each direction hole
+var DirHolePos;   // position of direction holes
+var LTuneDiff;    // length difference for direction holes
+var ActualRatio;  // ratio of bore length / diam * diam
+var ActualRatio1; // ratio of bore length / diam
+var ActualRatio2; // Lew Price's length / diam * diam ratio
+var DesiredRatio;  // as calculated for ActualRatio
+var SqRatioType;  // ratio type: if true, it's L/d*d, otherwise L/d
+var EffectiveWidth;  // bore width for actual ratio of 24
+var EffectiveHeight;  // bore height for actual ratio of 24
+var EffectiveDiameter;  // effective bore diameter of oval hole
+var HoleCorrection = new Array(10);  // Bore length correction at each sound hole
+
+// Moved to AcousticCalcs.js
+//var EqualTemperament = true;  // OLD boolean, equal temperament if true, harmonic if false
+//var temperamentID = "e";	// New indicator as of v1.38b
+
+var MidiKey = 66;  // default MidiCode, F#4
+
+var EnteredWidth;  // value of entered router bit diameter
+var EffectiveHeight1;  // bore height for EnteredWidth
+var ShowEnteredOval;  // display calculations for oval bore with entered width
+var HighestNote;  // highest note expected from a NAF
+var K2max;  // maximum k2 for HighestNote
+var MinHoleSize;  // minimum playing hole size
+var HoleCorrectionType;  // 0 => no correction, 1 => fixed edge correction, 2 => moveable edge correction 3 => small flute, moveable edge correction
+var TshWidthType;  // 0 => fraction of bore diameter, 1 => fraction of bore width
+var TshBoreFraction;  // TSH width / either bore diameter or width
+
+//var lowC = 130.81278;  // Frequency of low C.
+// moved to AcousticCalcs.js
+//var lowC = 65.40639;  // Frequency of low C.
+
+// Effective wall thickness, i.e. height of air column at open finger holes;
+// air column extends out past end of hole 3/4 of the hole diameter.
+// From P. Kosel's Flutomat.
+function te(n) 
+{
+	return (1.0*Wall) + (0.75*Edf[n]);
+}
+
+// Closed hole for tone hole n.  The length of the vibrating air column is
+// effectively increased by each closed tone hole which exists above the
+// first open tone hole. Corrections must be added for each such closed tone
+// tone hole to C_end, C_s, and C_o.
+// From P. Kosel's Flutomat.
+function C_c(n) 
+{
+	return 0.25 * Wf[n] * (Edf[n]/Bore)*(Edf[n]/Bore);
+}
+
+// Calculates the distance from physical open end of flute to effective end of
+// vibrating air column.  The vibrating air column ends beyond the end of the
+// flute and C_end is always positive. NOTE: Closed hole corrections must be added to
+// this value!
+// From P. Kosel's Flutomat (and others).
+function C_end()
+{ 
+	return 1 * Bore / 3; 
+}
+
+// Calculates the effective bore length for an open hole.
+// From L. P. Price.
+function EffHoleLength( i )
+{
+    var holeDiam;
+    var ratio;
+
+    holeDiam = Edf[i];
+    ratio = Bore / holeDiam;
+
+    return ratio * ratio * (0.66667 * holeDiam + 1.0 * Wf[i] );
+}
+
+// Effective bore length for a single direction hole.
+// From L. P. Price.
+function EffTuningHoleLength()
+{
+    var effDiam;
+    var ratio;
+
+    effDiam = EffTuningHoleDiameter();
+    //alert( "Equivalent diameter for tuning holes: " + effDiam );
+
+    ratio = Bore / effDiam;
+
+    return ratio * ratio * ( 0.66667 * DirHoleDiam + 1.0 * DirHoleWall );
+}
+
+// Calculates the effective diameter of n holes, of the same size and position.
+function EffTuningHoleDiameter()
+{
+    var holeDiam;
+
+    holeDiam = 1.0 * DirHoleDiam * Math.sqrt( 1.0 * NumDirHoles );
+
+    return holeDiam;
+}
+
+// Calculates the position of the six sound holes.
+// The mode 1/4 tuning is hard wired here.
+// From L. P. Price.
+function EffHolePosition( i )
+{
+    var thLength;
+    var priorLength;
+    var priorDiff;
+    var lenDiff;
+    var holeLength;
+    var holePosition;
+    var a;
+    var b;
+    var c;
+
+    thLength = Vsound * 0.5 / Ff[i];
+    if ( i == 1 )
+    {
+        if ( UseDirHoles )
+        {
+            DirHolePosition();
+            priorDiff = LTuneDiff;
+        }
+        else
+        {
+            priorDiff = 0.;
+        }
+       priorLength = Vsound * 0.5 / Fend;
+    }
+    else if ( i == 4 )
+    {
+    	priorLength = PriorLength2;
+    	priorDiff = PriorDiff2;
+    }
+    else if ( i == 5 )
+    {
+    	priorLength = PriorLength3;
+    	priorDiff = PriorDiff3;
+    }
+    else
+    {
+        priorLength = Vsound * 0.5 / Ff[i-1];
+        priorDiff = LDiff[i-1];
+    }
+
+    lenDiff = priorLength - thLength;
+    LDiff[i] = lenDiff + priorDiff;
+    
+    if ( i == 2 )
+    {
+    	PriorLength2 = thLength;
+    	PriorDiff2 = lenDiff + priorDiff;
+    }
+    else if ( i == 3 )
+    {
+    	PriorLength3 = thLength;
+    	PriorDiff3 = lenDiff + priorDiff;
+    }
+
+    holeLength = EffHoleLength( i );
+
+	if ( English )
+	{
+		tangent_div = 4;
+	}
+	else
+	{
+		tangent_div = 10.16;
+	}
+	
+    a = 1 / (holeLength * (1 + Df[i] / tangent_div));
+    b = 1 / (1 + Bore /tangent_div);
+    c = lenDiff * a + b - 1;
+    holePosition = (Math.sqrt(c * c + 4 * lenDiff * a) - lenDiff * a - b + 1)/(2*a);
+    holePosition += LDiff[i] - C_end();
+	//alert( "Hole position corrected: " + holePosition );
+
+    return holePosition;
+}
+
+// Calculates the position of the direction hole(s).
+// From L. P. Price.
+function DirHolePosition()
+{
+    var thLength;
+    var holeLength;
+    var holePosition;
+    var lenDiff;
+    var a;
+    var b;
+    var c;
+
+    thLength = Vsound * 0.5 / DirHoleFreq;
+    holeLength = EffTuningHoleLength();
+    lenDiff = thLength - Vsound * 0.5 / Fend;
+
+	if ( English )
+	{
+		tangent_div = 4;
+	}
+	else
+	{
+		tangent_div = 10.16;
+	}
+	
+    a = 1 / ( holeLength * ( 1 + EffTuningHoleDiameter() / tangent_div ) );
+    b = 1 / ( 1 + Bore / tangent_div );
+    c = lenDiff * a + b - 1;
+    holePosition = (Math.sqrt(c * c + 4 * lenDiff * a) - lenDiff * a - b + 1)/(2*a);
+    holePosition += lenDiff - C_end();
+
+    LTuneDiff = lenDiff;
+    DirHolePos = holePosition;
+
+    return holePosition;
+}
+
+// Calculates k2, the extension of the sound bore on the "north" end resulting
+// from TSH and fetish effects.
+// From L. P. Price.
+function C_emb( bore )
+{
+    var Demb;
+    var EffThickness;
+    var k2;
+    
+    Demb = 2 * Math.sqrt( 1.0 * Lemb * Wemb / Math.PI );
+    EffThickness = 1.0 * Wall * TSHThicknessFactor;
+    EffThickness = ( 2.0 * EffThickness * Lemb 
+    					+ 1.0 * Wemb * ( 1.0 * FippleThickness + EffThickness - 1.0 * FlueDepth ) )
+    				  / ( 2.0 * ( 1.0 * Wemb + 1.0 * Lemb ) );
+    
+    k2 = (bore/Demb)*(bore/Demb)*(BirdFactor*Demb + EffThickness);
+    return k2;
+}
+
+// function SetSpeedOfSound () is now in AcousticCalcs.js
+
+// Wrapper for calculating sound hole locations.
+// From P. Kosel and L. P. Price.	
+function FindLocations2()
+{
+	var i;
+	var L;
+	var holeNum;
+	var a,b,c;
+
+	HoleCorrection[0] = 0.;
+	for ( i = 1; i <= holeCount; i++ ) 
+	{
+		HoleCorrection[i] = HoleCorrection[i-1] + C_c(i);  // subtract closed hole corrections
+	}
+
+	for (holeNum = 1; holeNum <= holeCount; holeNum++)
+	{
+    	Xf[holeNum] = EffHolePosition( holeNum ) - HoleCorrection[holeNum];
+	}
+
+	// find end location...
+	Xend = Vsound * 0.5 / Fend;  // uncorrected location
+	if ( UseDirHoles )
+	{
+    	Xend = Vsound * 0.5 / DirHoleFreq;
+    	DirHolePos -= HoleCorrection[holeCount];
+	}
+	else
+	{
+		Xend -= HoleCorrection[holeCount];
+	}
+
+	Xend = Xend - C_end();  // subtract end correction
+
+	// set embouchure hole location
+	Xemb = C_emb( Bore );
+}
+
+// Calculates oval bore parameters and length ratio.
+function FindBoreParameters()
+{
+	var theoLength;
+	var length;
+	var length1;
+	var length2;
+	var diam;
+
+	length = Vsound * 0.5 / Fend; // Theoretical length
+	length1 = length - Xemb - HoleCorrection[0] - C_end(); // Actual bore length
+	length2 = length - Xemb - HoleCorrection[0];  // Actual bore length + k1
+	ActualRatio = length / ( Bore * Bore );
+	ActualRatio1 = length1 / Bore;
+	ActualRatio2 = length2 / Math.pow(Bore, 2);
+	
+	diam = SqRatioType == 0 ? Math.sqrt( length / DesiredRatio ) : SqRatioType == 1 ? Math.pow(( length2 / DesiredRatio ), 0.5) : length1 / DesiredRatio;
+	theoLength = SqRatioType == 0 ? length : SqRatioType == 1 ? length2 + Xemb + C_end() : length1 + Xemb;
+	
+	while ( true )
+	{
+		switch ( SqRatioType)
+		{
+			case 0:
+				length = theoLength;
+				EffectiveDiameter = Math.sqrt( length / DesiredRatio );
+				break;
+			case 1:
+				// pre-12/9/2010 code: length = theoLength - C_emb( diam ) - C_end();
+				length = theoLength - C_emb( diam ) - diam / 3.;
+				EffectiveDiameter = Math.pow(( length / DesiredRatio ), 0.5);
+				break;
+			default:
+				length = theoLength - C_emb( diam );
+				EffectiveDiameter = length / DesiredRatio;
+				break;
+		}
+		// pre-12/9/2010 code: if ( Math.abs( EffectiveDiameter - diam ) < 0.0005 )
+		if ( Math.abs( EffectiveDiameter - diam ) < 0.0002 )
+		{
+			break;
+		}
+		
+		// pre-12/9/10 code:	diam = EffectiveDiameter;
+		// New code below (just this IF statement) was done by Ed Kort
+		// 12/9/2010 to fix a bug that hung the code if a flute with key
+		// below G,, was selected. See email this date from Ed.
+		// Four other changes in this routine were also made, as noted 
+		
+		if ( diam > EffectiveDiameter )
+        {
+            diam = ( diam - EffectiveDiameter ) / 2. + EffectiveDiameter;
+        }
+        else
+        {
+            diam = ( EffectiveDiameter - diam ) / 2. + diam;
+        }
+		
+	}
+	
+	// Assume bore widths in units of 1/8 inch or 2 mm
+	if ( English )
+	{
+		// pre-12/9/2010 code:  for ( diam = 2.0; diam >= 0.; diam -= 0.1250 )
+		for ( diam = 4.0; diam >= 0.; diam -= 0.1250 )
+		{
+			if ( diam <= EffectiveDiameter || Math.abs( diam - EffectiveDiameter ) < 0.001 )
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		// pre-12/9/2010 code:  for ( diam = 50.; diam >= 0.; diam -= 0.2 )
+		for ( diam = 100.; diam >= 0.; diam -= 0.2 )
+		{
+			if ( diam <= EffectiveDiameter )
+			{
+				break;
+			}
+		}
+	}
+	EffectiveWidth = diam;
+	
+	length = 3.141593 * ( EffectiveDiameter * EffectiveDiameter 
+							- EffectiveWidth * EffectiveWidth ) / ( 4. * EffectiveWidth );
+	EffectiveHeight = EffectiveWidth + length;
+	
+	if ( EnteredWidth != "" && EnteredWidth != 0 )
+	{
+		length = 3.141593 * ( EffectiveDiameter * EffectiveDiameter
+								- EnteredWidth * EnteredWidth ) / ( 4. * EnteredWidth );
+		EffectiveHeight1 = 1. * EnteredWidth + length;
+		ShowEnteredOval = true;
+	}
+	else
+	{
+		ShowEnteredOval = false;
+	}
+}
+
+// Calculates highest possible note and minimum finger hole size.
+// From L. P. Price.
+function FindMiscParameters()
+{
+	var fudgeMult = 0.018;
+	var holeWall = getAverageHoleWall();
+	
+	if ( HighestNote / Fend >= 2.0 )
+	{
+		fudgeMult = 0.005;
+	}
+	
+	K2max = Vsound / HighestNote / 4  - fudgeMult * Vsound / Fend;
+	
+	MinHoleSize = ( 2. / 3 + Math.sqrt( 4. / 9 + 4. * holeWall * K2max/ ( Bore * Bore ) ) ) / ( 2. * K2max / ( Bore * Bore ) );
+}
+
+// Gets the average wall thickness at all the holes with diameter > 0.
+function getAverageHoleWall()
+{
+	var holeWall = 0.;
+	var count = 0;
+	var i;
+	
+	for ( i = 1; i <= holeCount; i++ )
+	{
+		if ( Edf[i] > 0. )
+		{
+			count++;
+			holeWall += 1.0 * Wf[i];
+		}
+	}
+	
+	if ( count > 0 )
+	{
+		return holeWall / count;
+	}
+	
+	return 0.;
+}
+
+// Handle changes in the pitch standard
+
+function A4UpClick () {
+	with (document.forms.fluteForm) {
+		++standardA4Frequency.value;
+		pitchStandardChange();
+	}
+}
+function A4DownClick () {
+	with (document.forms.fluteForm) {
+		--standardA4Frequency.value;
+		pitchStandardChange();
+	}
+}
+function pitchStandardChange () {
+	with (document.forms.fluteForm) {
+		keyChange(MidiKey);
+	}
+}
+
+// function midiCodeToFreq(midiCode) is now in AcousticCalcs.js
+
+// Sets the frequencies for each hole, for a given fundamental,
+// (represented by keyMidiCode).
+// Uses temperament as indicated by the global temperamentID.
+
+function keyChange(keyMidiCode)
+{
+	var freq;
+	var pitchStandard;
+	
+	with (document.forms.fluteForm) {
+		// Read the A4= standard frequency input
+		pitchStandard = standardA4Frequency.value;
+	}
+	
+	// Save midi key for temperament change listener.
+	MidiKey = keyMidiCode;
+
+	// sixth hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+12, pitchStandard);
+	document.forms.fluteForm.freq6.value = Math.round(100*freq)/100;
+
+	// fifth hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+10, pitchStandard);
+	document.forms.fluteForm.freq5.value = Math.round(100*freq)/100;
+
+	// fourth hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+8, pitchStandard);
+	document.forms.fluteForm.freq4.value = Math.round(100*freq)/100;
+
+	// third hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+7, pitchStandard);
+	document.forms.fluteForm.freq3.value = Math.round(100*freq)/100;
+
+	// second hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+5, pitchStandard);
+	document.forms.fluteForm.freq2.value = Math.round(100*freq)/100;
+
+	// first hole
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+3, pitchStandard);
+	document.forms.fluteForm.freq1.value = Math.round(100*freq)/100;
+
+	// end of flute
+	freq = getKeyFrequencyStandard (keyMidiCode, keyMidiCode+0, pitchStandard);
+	document.forms.fluteForm.freqEnd.value = Math.round(100*freq)/100;
+	
+	// Update the Highest Intended Note [was code 75]
+	// Set so that it is 17 semitones (a musical 11th = an octave + a fourth) above the selected fundamental of the flute.
+	// This works because the Highest Intended Note pulldown starts at Gs7 - two octaves above the highest flute fundamental of Gs5.
+	document.forms.fluteForm.keySelect3.selectedIndex = MIDI_Ds6 - keyMidiCode;
+	
+	// Update the direction holes note [was code 69]
+	// Set so that it is 1 semitone below the selected fundamental of the flute.
+	// This works because A5 is 1 semitone above the highest selectable fundamental Gs5.
+	// (The radio button indices are inverted from the MIDI codes).
+	document.forms.fluteForm.keySelect2.selectedIndex = MIDI_A5 - keyMidiCode;
+	keyChange2(keyMidiCode - 1);
+}
+
+
+// function getKeyFrequencyStandard (fundamental, note ) moved to AcousticCalcs.js
+
+// Set the frequency for the direction holes.
+
+function keyChange2( keyMidiCode )
+{	
+	with (document.forms.fluteForm) {
+
+		// Read the A4= standard frequency input
+	
+		var pitchStandard = standardA4Frequency.value;
+		//alert ("keyChange2/standardA4Frequency=" + pitchStandard);
+		var freq = midiCodeToFreqStandard (keyMidiCode+0, pitchStandard);
+		
+		dirHoleFreq1.value = Math.round( 100 * freq ) / 100;
+	}
+}
+
+// function scaleFrequency( oldSpeed, oldFreq, newSpeed ) now in AcousticCalcs.js
+// function getNote( freq ) now in AcousticCalcs.js
+
+// Change listener for the UI temperament radio buttons.
+// Sets the global temperamentID and fires keyChange() to
+// reset the playing frequencies.
+
+function temperamentChange()
+{
+	// Fetch the new value of the widget
+	// Accessing temperament.value works in Chrome but does NOT work in IE, so ...
+	
+	var tVal;
+	with (document.forms.fluteForm) {
+		for (var i=0; i < temperament.length; i++) {
+			if (temperament[i].checked) {
+				tVal = temperament[i].value;
+     		}
+		}
+	}
+
+	// Set the global variable for temperament.
+	
+	temperamentID = tVal;	
+	
+	// Set the ratio labels on the interface.
+	
+	with (document.forms.fluteForm) {
+		switch (tVal) {
+		
+		case "e": case "y": default:
+			ratio6Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratio5Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratio4Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratio3Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratio2Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratio1Label.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			ratioEndLabel.innerHTML = "&nbsp;&nbsp;&nbsp;";
+			break;
+			
+		case "1": case "n":
+			ratio6Label.innerHTML = "&nbsp;&nbsp;2:1";
+			ratio5Label.innerHTML = "&nbsp;&nbsp;9:5";
+			ratio4Label.innerHTML = "&nbsp;&nbsp;8:5";
+			ratio3Label.innerHTML = "&nbsp;&nbsp;3:2";
+			ratio2Label.innerHTML = "&nbsp;&nbsp;4:3";
+			ratio1Label.innerHTML = "&nbsp;&nbsp;6:5";
+			ratioEndLabel.innerHTML = "&nbsp;&nbsp;1:1";
+			break;
+			
+		case "2":
+			ratio6Label.innerHTML = "&nbsp;&nbsp;2:1";
+			ratio5Label.innerHTML = "&nbsp;16:9";
+			ratio4Label.innerHTML = "&nbsp;&nbsp;8:5";
+			ratio3Label.innerHTML = "&nbsp;&nbsp;3:2";
+			ratio2Label.innerHTML = "&nbsp;&nbsp;4:3";
+			ratio1Label.innerHTML = "&nbsp;&nbsp;6:5";
+			ratioEndLabel.innerHTML = "&nbsp;&nbsp;1:1";
+			break;
+		
+		case "p":
+			ratio6Label.innerHTML = "&nbsp;&nbsp;2:1";
+			ratio5Label.innerHTML = "&nbsp;16:9";
+			ratio4Label.innerHTML = "128:81";
+			ratio3Label.innerHTML = "&nbsp;&nbsp;3:2";
+			ratio2Label.innerHTML = "&nbsp;&nbsp;4:3";
+			ratio1Label.innerHTML = "&nbsp;32:27";
+			ratioEndLabel.innerHTML = "&nbsp;&nbsp;1:1";
+			break;	
+		}
+	}	
+	// Simulate a change in key to force default processing.
+	
+	keyChange( MidiKey );
+}
+
+// Change listener for the UI units radio buttons.
+// Used exclusively to set labels on the interface.
+
+function updateUnitLabels()
+{
+	with (document.forms.fluteForm) {
+
+		var unitsImperial = units[1].checked;
+
+		var temperatureLabel = "&deg;C";
+		var speedLabel = "m/sec";
+		var distanceLabel = "cm";
+		
+		if (unitsImperial) {
+			temperatureLabel = "&deg;F";
+			speedLabel = "ft/sec";
+			distanceLabel = "in";
+		}
+		
+		ambientTempLabel.innerHTML = temperatureLabel;
+		vsoundLabel.innerHTML = speedLabel;
+		ambientTempTLabel.innerHTML = temperatureLabel;
+		vsoundTLabel.innerHTML = speedLabel;
+
+		boreLabel.innerHTML = distanceLabel;
+			
+		flueDepthLabel.innerHTML = distanceLabel;
+		fippleThicknessLabel.innerHTML = distanceLabel;
+		widthEmbLabel.innerHTML = distanceLabel;
+		lenEmbLabel.innerHTML = distanceLabel;
+		wallLabel.innerHTML = distanceLabel;		
+			
+		effectiveWidthLabel.innerHTML = distanceLabel;		
+		effectiveHeightLabel.innerHTML = distanceLabel;		
+		effectiveDiameterLabel.innerHTML = distanceLabel;		
+		effectiveWidth1Label.innerHTML = distanceLabel;		
+		effectiveHeight1Label.innerHTML = distanceLabel;		
+		effectiveDiameter1Label.innerHTML = distanceLabel;		
+		
+		diam6Label.innerHTML = distanceLabel;
+		diam5Label.innerHTML = distanceLabel;
+		diam4Label.innerHTML = distanceLabel;
+		diam3Label.innerHTML = distanceLabel;
+		diam2Label.innerHTML = distanceLabel;
+		diam1Label.innerHTML = distanceLabel;
+
+		wall6Label.innerHTML = distanceLabel;
+		wall5Label.innerHTML = distanceLabel;
+		wall4Label.innerHTML = distanceLabel;
+		wall3Label.innerHTML = distanceLabel;
+		wall2Label.innerHTML = distanceLabel;
+		wall1Label.innerHTML = distanceLabel;
+
+		resultEmbLabel.innerHTML = distanceLabel;
+		result6Label.innerHTML = distanceLabel;
+		result5Label.innerHTML = distanceLabel;
+		result4Label.innerHTML = distanceLabel;
+		result3Label.innerHTML = distanceLabel;
+		result2Label.innerHTML = distanceLabel;
+		result1Label.innerHTML = distanceLabel;
+			
+		space6Label.innerHTML = distanceLabel;
+		space5Label.innerHTML = distanceLabel;
+		space4Label.innerHTML = distanceLabel;
+		space3Label.innerHTML = distanceLabel;
+		space2Label.innerHTML = distanceLabel;
+		
+		dirHoleDiamLabel.innerHTML = distanceLabel;
+		dirHoleWallLabel.innerHTML = distanceLabel;
+		dirHolePosLabel.innerHTML = distanceLabel;	
+	}
+}
+
+// Change the internal finger hole diameter based on empirical
+// hole sizes vs calculated.
+function CorrectHoleSizes()
+{
+	var multNoCorr = new Array( holeCount + 1 );
+	var offsetNoCorr = new Array( holeCount + 1 );
+	var multFixed = new Array( holeCount + 1 );
+	var offsetFixed = new Array( holeCount + 1 );
+	var multMoveable = new Array( holeCount + 1 );
+	var offsetMoveable = new Array( holeCount + 1 );
+	var multSmall = new Array( holeCount + 1 );
+	var offsetSmall = new Array( holeCount + 1 );
+	var multiplier = new Array( holeCount + 1 );
+	var flueRatio;
+	var correction;
+	var i;
+	
+	multNoCorr[1] = 0.0, multNoCorr[2] = 0.0,  multNoCorr[3] = 0.0, multNoCorr[4] = 0.0, multNoCorr[5] = 0.0, multNoCorr[6] = 0.0;
+	offsetNoCorr[1] = 1.0, offsetNoCorr[2] = 1.0, offsetNoCorr[3] = 1.0, offsetNoCorr[4] = 1.0, offsetNoCorr[5] = 1.0, offsetNoCorr[6] = 1.0;
+	multFixed[6] = 0.9112, multFixed[5] = 0.221, multFixed[4] = 0.3208, multFixed[3] = 0.2064, multFixed[2] = 0.0, multFixed[1] = -0.3173;
+	offsetFixed[6] = 0.5036, offsetFixed[5] = 0.9224, offsetFixed[4] = 0.8731, offsetFixed[3] = 0.8617, offsetFixed[2] = 0.9683, offsetFixed[1] = 1.1492;
+	multMoveable[6] = 1.0832, multMoveable[5] = 0.2633, multMoveable[4] = 0.366, multMoveable[3] = 0.2203, multMoveable[2] = 0.0, multMoveable[1] = -0.331;
+	offsetMoveable[6] = 0.5986, offsetMoveable[5] = 1.099, offsetMoveable[4] = 0.9961, offsetMoveable[3] = 0.9195, offsetMoveable[2] = 1.0351, offsetMoveable[1] = 1.1989;
+	multSmall[6] = 0.9112, multSmall[5] = 0.221, multSmall[4] = 0.3208, multSmall[3] = 0.2064, multSmall[2] = 0.0, multSmall[1] = -0.3173;
+	offsetSmall[6] = 0.5036, offsetSmall[5] = 0.9224, offsetSmall[4] = 0.8731, offsetSmall[3] = 0.8617, offsetSmall[2] = 0.9683, offsetSmall[1] = 1.1492;
+	multiplier[6] = 0.926, multiplier[5] = 0.939, multiplier[4] = 0.954, multiplier[3] = 0.949, multiplier[2] = 0.965, multiplier[1] = 0.980;
+	//multiplier[6] = 1, multiplier[5] = 1, multiplier[4] = 1, multiplier[3] = 1, multiplier[2] = 1, multiplier[1] = 1;
+	
+	flueRatio = Wemb / Bore;
+	// alert( "Flue ratio: " + flueRatio );
+	
+	switch ( HoleCorrectionType )
+	{
+		case 1:
+			for ( i = 1; i <= holeCount; i++ )
+			{
+				correction = flueRatio * multFixed[i] + offsetFixed[i];
+				Edf[i] = Df[i] / multiplier[i] / correction;
+			//	if ( i == 1 )
+				//{
+					//alert( "Hole " + i + " correction: " + correction );
+				//}
+			}
+			break;
+		case 2:
+			for ( i = 1; i <= holeCount; i++ )
+			{
+				correction = flueRatio * multMoveable[i] + offsetMoveable[i];
+				Edf[i] = Df[i] / multiplier[i] / correction;
+				//if ( i == 1 )
+				//{
+					//alert( "Hole " + i + " correction: " + correction );
+				//}
+			}
+			break;
+		case 3:  // Parameters now the same as Fixed values
+			for ( i = 1; i <= holeCount; i++ )
+			{
+				correction = flueRatio * multSmall[i] + offsetSmall[i];
+				Edf[i] = Df[i] / multiplier[i] / correction;
+				//if ( i == 1 )
+				//{
+					//alert( "Hole " + i + " correction: " + correction );
+				//}
+			}
+			break;
+		default:
+			for ( i = 1; i <= holeCount; i++ )
+			{
+				correction = flueRatio * multNoCorr[i] + offsetNoCorr[i];
+				Edf[i] = Df[i] / correction;
+				//if ( i == 1 )
+				//{
+					//alert( "Hole " + i + " correction: " + correction );
+				//}
+			}
+			break;
+	}
+}
+
+// ActionEvent fired by the Calculate button
+function CalculateButClick()
+{
+	CalculateAll(true);
+}
+
+// This function does the gruntwork of getting input, calling the calculation routine,
+// and delivering the results
+function CalculateAll(calcBoreParameters)
+{
+    var i,Line;
+    var AmbientTemp, Humidity;
+    var AmbientTempT, HumidityT;
+    var VsoundT;
+    var tFreq;
+    // get input data
+    English = document.forms.fluteForm.units[1].checked;
+    with (document.forms.fluteForm)
+    {
+		FlueDepth = flueDepth.value;
+		FippleThickness = fippleThickness.value;
+		TSHThicknessFactor = tshThicknessFactor.value;
+		BirdFactor = birdFactor.value;
+		Bore = bore.value;//alert("bore="+Bore);
+		Wall = wall.value;
+		Lemb = lenEmb.value;
+		Wemb = widthEmb.value;
+		Df[1]= diam1.value;
+        Df[2]= diam2.value;
+        Df[3]= diam3.value;
+        Df[4]= diam4.value;
+        Df[5]= diam5.value;
+        Df[6]= diam6.value;
+        Ff[1]= freq1.value;
+        Ff[2]= freq2.value;
+        Ff[3]= freq3.value;
+        Ff[4]= freq4.value;
+        Ff[5]= freq5.value;
+        Ff[6]= freq6.value;
+        Wf[1] = wall1.value;
+        Wf[2] = wall2.value;
+        Wf[3] = wall3.value;
+        Wf[4] = wall4.value;
+        Wf[5] = wall5.value;
+        Wf[6] = wall6.value;
+        Fend = freqEnd.value;
+        UseDirHoles = useDirHole.checked;
+        NumDirHoles = dirHoleNum.selectedIndex + 1;
+        DirHoleFreqTune = dirHoleFreq1.value;
+        // DirHoleFreq = dirHoleFreq.value;
+        DirHoleWall = dirHoleWall.value;
+        DirHoleDiam = dirHoleDiam.value;
+        AmbientTemp = ambientTemp.value;
+        Humidity = humidity.value;
+        AmbientTempT = ambientTempT.value;
+        HumidityT = humidityT.value;
+        DesiredRatio = desiredRatio.value;
+        SqRatioType = ratioType[0].checked ? 0 : ratioType[1].checked ? 1 : 2;
+        EnteredWidth = effectiveWidth1.value;
+        if ( AmbientTempT.length == 0 || HumidityT.length == 0
+        		|| isNaN( AmbientTempT ) || isNaN( HumidityT ) )
+        {
+        	AmbientTempT = AmbientTemp;
+        	ambientTempT.value = AmbientTempT;
+        	HumidityT = Humidity;
+        	humidityT.value = HumidityT;
+        }
+		// [was code 92]
+		var pitchStandard = standardA4Frequency.value;
+		//alert ("CalculateAll/standardA4Frequency=" + pitchStandard);
+		HighestNote = midiCodeToFreqStandard (MIDI_Gs7 - keySelect3.selectedIndex, pitchStandard);
+		HoleCorrectionType = 0; // VERSION 35 CHANGE: holeCorrection[0].checked ? 0 : holeCorrection[1].checked ? 1 : holeCorrection[2].checked ? 2 : 3;
+		// alert("Hole correction: " + HoleCorrection);
+    }
+    
+    // perform calculations
+    Vsound = speedOfSound( AmbientTemp, Humidity );
+    VsoundT = speedOfSound( AmbientTempT, HumidityT );
+    DirHoleFreq = scaleFrequency( VsoundT, DirHoleFreqTune, Vsound );
+	CorrectHoleSizes();
+    FindLocations2();
+    if (calcBoreParameters)
+    {
+    	FindBoreParameters();
+    }
+    FindMiscParameters();
+    with (document.forms.fluteForm)
+    {
+    	 if ( English )
+    	 {
+        	vsound.value = Math.round(100*Vsound/12)/100;
+        	vsoundT.value = Math.round(100*VsoundT/12)/100;
+        }
+        else
+        {
+        	vsound.value = Math.round(Vsound)/100;
+        	vsoundT.value = Math.round(VsoundT)/100;
+        }
+        calck2.value = Math.round(1000*Xemb)/1000;
+        calck1.value = Math.round(1000.*Bore/3.)/1000;
+    	 actualRatio.value = Math.round(100*ActualRatio)/100;
+    	 actualRatio1.value = Math.round(100*ActualRatio1)/100;
+    	 actualRatio2.value = Math.round(100*ActualRatio2)/100;
+    	 effectiveDiameter.value = Math.round(1000*EffectiveDiameter)/1000;
+    	 effectiveWidth.value = Math.round(1000*EffectiveWidth)/1000;
+    	 effectiveHeight.value = Math.round(1000*EffectiveHeight)/1000;
+    	 if ( ShowEnteredOval )
+    	 {
+    	 	effectiveDiameter1.value = Math.round(1000*EffectiveDiameter)/1000;
+	    	effectiveWidth1.value = Math.round(1000*EnteredWidth)/1000;
+    	 	effectiveHeight1.value = Math.round(1000*EffectiveHeight1)/1000;
+    	 }
+    	 k2max.value = Math.round(1000*K2max)/1000;
+    	 minHoleSize.value = Math.round(1000*MinHoleSize)/1000;
+        resultEmb.value = Math.round(1000*(Xend-Xemb))/1000;
+        result6.value = Math.round(1000*(Xf[6]))/1000;
+        result5.value = Math.round(1000*(Xf[5]))/1000;
+        result3.value = Math.round(1000*(Xf[3]))/1000;
+        result2.value = Math.round(1000*(Xf[2]))/1000;
+        result1.value = Math.round(1000*(Xf[1]))/1000;
+        space6.value = Math.round(1000*(Xf[6]-Xf[5]))/1000;
+        if ( Df[4] < 0.01 )
+        {
+        	result4.value="";
+        	space5.value = Math.round(1000*(Xf[5]-Xf[3]))/1000;
+        	space4.value = "";
+        }
+        else
+        {
+        	result4.value = Math.round(1000*(Xf[4]))/1000;
+        	space5.value = Math.round(1000*(Xf[5]-Xf[4]))/1000;
+        	space4.value = Math.round(1000*(Xf[4]-Xf[3]))/1000;
+        }
+        space3.value = Math.round(1000*(Xf[3]-Xf[2]))/1000;
+        space2.value = Math.round(1000*(Xf[2]-Xf[1]))/1000;
+        if ( UseDirHoles )
+        {
+            dirHolePos.value = Math.round( 1000 * DirHolePos ) / 1000;
+        }
+        else
+        {
+            dirHolePos.value = "";
+        }
+        
+        tFreq = scaleFrequency( Vsound, Ff[6], VsoundT );
+        freq7.value = Math.round(100*tFreq)/100;
+        note7.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Ff[5], VsoundT );
+        freq8.value = Math.round(100*tFreq)/100;
+        note8.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Ff[4], VsoundT );
+        freq9.value = Math.round(100*tFreq)/100;
+        note9.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Ff[3], VsoundT );
+        freq10.value = Math.round(100*tFreq)/100;
+        note10.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Ff[2], VsoundT );
+        freq11.value = Math.round(100*tFreq)/100;
+        note11.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Ff[1], VsoundT );
+        freq12.value = Math.round(100*tFreq)/100;
+        note12.value = getNote( tFreq );
+        tFreq = scaleFrequency( Vsound, Fend, VsoundT );
+        freqEnd1.value = Math.round(100*tFreq)/100;
+        noteEnd1.value = getNote( tFreq );
+        dirHoleFreq.value = Math.round(100*DirHoleFreq)/100;
+        noteDirHole1.value = getNote( DirHoleFreqTune );
+        noteDirHole.value = getNote( DirHoleFreq );
+		
+		// Set hole diameter colors based on how they compare to the minimum hole size calculation
+		
+		var mhs1 = minHoleSize.value;
+		var mhs2 = mhs1 * 0.90;
+
+		// Determine how many finger hole fields should be colored
+		
+		var highestMIDI = MIDI_Gs7 - keySelect3.selectedIndex;
+		var fundMIDI = MidiKey;
+		var semitoneRange = highestMIDI - fundMIDI;
+		//alert("highestMIDI="+highestMIDI+" fundMIDI="+fundMIDI+" semitoneRange="+semitoneRange);
+
+		var blankColor = "#ffffff";
+		var okColor = "#f5fff5";
+		var smColor = "#ffdddd";
+		var tinyColor = "#ffbbbb";
+		
+		//var d6color = ((diam6.value < mhs2) ?  tinyColor : ((diam6.value < mhs1) ?  smColor : okColor));
+		// alert ("d6color:"+d6color);
+    	//diam6.style.backgroundColor = d6color;
+		
+		diam6.style.backgroundColor = blankColor;
+		diam5.style.backgroundColor = blankColor;
+		diam4.style.backgroundColor = blankColor;
+		diam3.style.backgroundColor = blankColor;
+		diam2.style.backgroundColor = blankColor;
+		diam1.style.backgroundColor = blankColor;
+		
+		if (semitoneRange >= 24) {
+			diam6.style.backgroundColor = ((diam6.value < mhs2) ?  tinyColor : ((diam6.value < mhs1) ?  smColor : okColor));
+		}
+		if (semitoneRange >= 22) {
+			diam5.style.backgroundColor = ((diam5.value < mhs2) ?  tinyColor : ((diam5.value < mhs1) ?  smColor : okColor));
+		}
+		if (semitoneRange >= 20) {
+			diam4.style.backgroundColor = ((diam4.value < mhs2) ?  tinyColor : ((diam4.value < mhs1) ?  smColor : okColor));
+		}
+		if (semitoneRange >= 19) {
+			diam3.style.backgroundColor = ((diam3.value < mhs2) ?  tinyColor : ((diam3.value < mhs1) ?  smColor : okColor));
+		}
+		if (semitoneRange >= 17) {
+			diam2.style.backgroundColor = ((diam2.value < mhs2) ?  tinyColor : ((diam2.value < mhs1) ?  smColor : okColor));
+		}
+		if (semitoneRange >= 15) {
+			diam1.style.backgroundColor = ((diam1.value < mhs2) ?  tinyColor : ((diam1.value < mhs1) ?  smColor : okColor));
+		}
+	}
+}
+
+function transformButClick()
+{
+	var midiCode;
+	var plusBool;
+	var offset;
+	var freq;
+	
+	with (document.forms.fluteForm)
+    {
+		// [was code 92]
+		midiCode = MIDI_Gs7 - keySelect4.selectedIndex;
+		plusBool = plusMinus[0].checked;
+		offset = centOffset.value;
+		if ( plusBool )
+		{
+			midiCode += offset / 100.;
+		}
+		else
+		{
+			midiCode -= offset / 100.;
+		}
+		var pitchStandard = standardA4Frequency.value;
+		freq = midiCodeToFreqStandard(midiCode, pitchStandard);
+		hzValue.value = Math.round( 100 * freq ) / 100;
+	}
+}
+
+function calculateBirdFactorClick()
+{
+	var vBoreLength;
+	var vOriginalBoreLength;
+	var vBirdFactor = 0.8;
+	var direction = 0;
+	var difference;
+	var iteration = 0;
+	var increment = 0.1;
+	
+	with (document.forms.fluteForm)
+	{
+		vOriginalBoreLength = resultEmb.value;
+		useDirHole.checked = true;
+		if (vOriginalBoreLength == "")
+		{
+			alert("Please enter a value in \"Total bore length\"");
+			return;
+		}
+		while (true)
+		{
+			birdFactor.value=Math.round(1000*vBirdFactor)/1000;
+			CalculateButClick();
+			vBoreLength = resultEmb.value;
+			difference = vOriginalBoreLength - vBoreLength;
+			if (difference > 0.001)
+			{
+				if (direction == -1)
+				{
+					if (increment > 0.0001)
+					{
+						vBirdFactor -= 0.667 * increment;
+						increment /= 10.;
+					}
+					else
+					{
+						break;
+					}
+				}
+				vBirdFactor -= increment;
+				direction = 1;
+			}
+			else if (difference < -0.0001)
+			{
+				if (direction == 1)
+				{
+					if (increment > 0.0001)
+					{
+						vBirdFactor += 0.667 * increment;
+						increment /= 10.;
+					}
+					else
+					{
+						break;
+					}
+				}
+				vBirdFactor += increment;
+				direction = -1;
+			}
+			else
+			{
+				break;
+			}
+			iteration++;
+			if (iteration > 1000)
+			{
+				alert("Too many iterations");
+				break;
+			}
+		}
+		useDirHole.checked = false;
+		CalculateButClick();
+	}
+}
+
+function calculateTshFactorClick()
+{
+	var vBoreLength;
+	var vOriginalBoreLength;
+	var vBirdFactor = 0.667;
+	var vTshFactor = 0.7;
+	var direction = 0;
+	var difference;
+	var iteration = 0;
+	var increment = 0.1;
+	
+	with (document.forms.fluteForm)
+	{
+		vOriginalBoreLength = resultEmb.value;
+		useDirHole.checked = true;
+		if (vOriginalBoreLength == "")
+		{
+			alert("Please enter a value in \"Total bore length\"");
+			return;
+		}
+		birdFactor.value=Math.round(1000*vBirdFactor)/1000;
+		while (true)
+		{
+			tshThicknessFactor.value = Math.round(1000*vTshFactor)/1000;
+			CalculateButClick();
+			vBoreLength = resultEmb.value;
+			difference = vOriginalBoreLength - vBoreLength;
+			if (difference > 0.001)
+			{
+				if (direction == -1)
+				{
+					if (increment > 0.0001)
+					{
+						vTshFactor -= 0.667 * increment;
+						increment /= 10.;
+					}
+					else
+					{
+						break;
+					}
+				}
+				vTshFactor -= increment;
+				direction = 1;
+			}
+			else if (difference < -0.0001)
+			{
+				if (direction == 1)
+				{
+					if (increment > 0.0001)
+					{
+						vTshFactor += 0.667 * increment;
+						increment /= 10.;
+					}
+					else
+					{
+						break;
+					}
+				}
+				vTshFactor += increment;
+				direction = -1;
+			}
+			else
+			{
+				break;
+			}
+			iteration++;
+			if (iteration > 1000)
+			{
+				alert("Too many iterations");
+				break;
+			}
+		}
+		 useDirHole.checked = false;
+	}
+}
+
+function calculateBoreClick()
+{
+	var vTshWidth;
+	var vPriorTshWidth;
+	var vOriginalTshWidth;
+	var vWhichRatio;
+	var vRatio;
+	var vEffDiam;
+	var vEffWidth;
+	
+	CalculateAll(true);
+	
+	with (document.forms.fluteForm)
+    {
+    	vWhichRatio = tsh_radio[0].checked ? 0 : tsh_radio[1].checked ? 1 : 2;
+    	vOriginalTshWidth = widthEmb.value;
+    	vRatio = TSH_fraction.value;
+    	vPriorTshWidth = vOriginalTshWidth;
+    	
+    	while (true)
+    	{
+    		switch (vWhichRatio)
+    		{
+	    		case 0:
+    				vTshWidth = vRatio * effectiveDiameter1.value;
+    				break;
+				case 1:
+    				vTshWidth = vRatio * effectiveWidth1.value;
+    				break;
+				default:
+    				vEffDiam = effectiveDiameter1.value;
+    				vEffWidth = effectiveWidth1.value;
+	    			if (vEffDiam < vEffWidth)
+	    			{
+	    				vTshWidth = vEffDiam * vRatio;
+	    			}
+	    			else
+	    			{
+	    				vTshWidth = vEffWidth * vRatio;
+	    			}
+    		}
+    		if (Math.abs(vTshWidth - vPriorTshWidth) < 0.001)
+    		{
+    			break;
+    		}
+    		widthEmb.value = vTshWidth;
+    		vPriorTshWidth = vTshWidth;
+    		CalculateAll(true);
+    	}
+    	
+    	widthEmb.value = vOriginalTshWidth;
+    	TSH_width.value = Math.round(1000*vTshWidth)/1000;
+    	CalculateAll(false);
+	}
+}
+
+function CopyWallButClick()
+{
+	var vThickness;
+	
+	with (document.forms.fluteForm)
+	{
+		vThickness = wall6.value;
+		wall5.value = vThickness;
+		if (wall4.value != "" && wall4.value != 0)
+		{
+			wall4.value = vThickness;
+		}
+		wall3.value = vThickness;
+		wall2.value = vThickness;
+		wall1.value = vThickness;
+		dirHoleWall.value = vThickness;
+	}
+}
+
+// Create a string that can be re-loaded directly to this code.
+// Note that the order of parameters is significant. It controls the order of processing
+// when the parameters are reloaded. For example. +ps=, +k1=, and +et= must appear before the
+// frequency values, so that the frequencies will not be overwritten by the default-value processing
+// inherent in setting those ps, k1, and et values.
+
+function createURLString()
+{
+	var url = location.href.substring( 0, location.href.indexOf( "?" ) );
+	var tempVal;
+	url = url == "" ? location.href : url;
+	
+	with ( document.forms.fluteForm )
+	{
+		url += "?in=" + ( units[1].checked ? "y" : "n" );
+        url += "+pt=" + ambientTemp.value;
+        url += "+ph=" + humidity.value;
+        url += "+tt=" + ambientTempT.value;
+        url += "+th=" + humidityT.value;
+		url += "+bd=" + bore.value;
+    	url += "+fd=" + flueDepth.value;
+    	url += "+ft=" + fippleThickness.value;
+		url += "+tw=" + widthEmb.value;
+		url += "+tl=" + lenEmb.value;
+		url += "+wt=" + wall.value;
+    	url += "+tf=" + tshThicknessFactor.value;
+    	url += "+bf=" + birdFactor.value;
+    	url += "+twf=" + TSH_fraction.value;
+    	url += "+twt=" + ( tsh_radio[0].checked ? "0" : tsh_radio[1].checked ? "1" : "2" );
+        url += "+sr=" + ( ratioType[0].checked ? "0" : ratioType[1].checked ? "1" : "2" );
+        url += "+dr=" + desiredRatio.value;
+        url += "+rw=" + effectiveWidth1.value;
+		url += "+k1=" + keySelect.selectedIndex;
+		url += "+ps=" + standardA4Frequency.value;
+		
+		// Fetch the value of the temperament widget directly from the global variable.
+		// OLD: url += "+et=" + ( temperament[0].checked ? "y" : "n" );
+		url += "+et=" + temperamentID;
+		
+		url += "+hn=" + keySelect3.selectedIndex;
+        url += "+f1=" + freq1.value;
+        url += "+f2=" + freq2.value;
+        url += "+f3=" + freq3.value;
+        url += "+f4=" + freq4.value;
+        url += "+f5=" + freq5.value;
+        url += "+f6=" + freq6.value;
+        url += "+fe=" + freqEnd.value;
+		url += "+h1d=" + diam1.value;
+		url += "+h2d=" + diam2.value;
+		url += "+h3d=" + diam3.value;
+		url += "+h4d=" + diam4.value;
+		url += "+h5d=" + diam5.value;
+		url += "+h6d=" + diam6.value;
+		url += "+w1=" + wall1.value;
+		url += "+w2=" + wall2.value;
+		url += "+w3=" + wall3.value;
+		url += "+w4=" + wall4.value;
+		url += "+w5=" + wall5.value;
+		url += "+w6=" + wall6.value;
+        url += "+ud=" + ( useDirHole.checked ? "y" : "n" );
+        url += "+dn=" + dirHoleNum.selectedIndex;
+		url += "+dv=" + keySelect2.selectedIndex;
+        url += "+df=" + dirHoleFreq1.value;
+        url += "+wh=" + dirHoleWall.value;
+        url += "+hd=" + dirHoleDiam.value;
+		tempVal = "0"; // VERSION 35 CHANGE: holeCorrection[0].checked ? "0" : holeCorrection[1].checked ? "1" : holeCorrection[2].checked ? "2" : "3";
+		url += "+hc=" + tempVal;
+	}
+	
+	return url;
+}
+
+function createURL()
+{
+	prompt( "Copy this URL, and\nsave it to a file.", createURLString() );
+}
+
+function reload()
+{
+	location.replace( createURLString() );
+}
+
+function updateValue( parameter, value )
+{
+	with ( document.forms.fluteForm )
+	{
+		if ( parameter == "bd" )
+		{
+			bore.value = value;
+		}
+		else if ( parameter == "tw" )
+		{
+			widthEmb.value = value;
+		}
+		else if ( parameter == "tl" )
+		{
+			lenEmb.value = value;
+		}
+		else if ( parameter == "wt" )
+		{
+			wall.value = value;
+		}
+		else if ( parameter == "w1" )
+		{
+			wall1.value = value;
+		}
+		else if ( parameter == "w2" )
+		{
+			wall2.value = value;
+		}
+		else if ( parameter == "w3" )
+		{
+        	wall3.value = value;
+		}
+		else if ( parameter == "w4" )
+		{
+        	wall4.value = value;
+		}
+		else if ( parameter == "w5" )
+		{
+        	wall5.value = value;
+		}
+		else if ( parameter == "w6" )
+		{
+        	wall6.value	= value;
+		}
+		else if ( parameter == "in" )
+		{
+			if ( value == "y" )
+			{
+				units[1].checked = true;
+			}
+			else
+			{
+				units[0].checked = true;
+			}
+		}
+		else if ( parameter == "k1" )
+		{
+			keySelect.selectedIndex = value;
+			// Simulate a "key change". This will fire off the default processing and cause
+			// many other values to be adjusted.
+			// [was code 68]
+			keyChange( MIDI_Gs5 - value );
+		}
+		else if ( parameter == "h1d" )
+		{
+			diam1.value = value;
+		}
+		else if ( parameter == "h2d" )
+		{
+			diam2.value = value;
+		}
+		else if ( parameter == "h3d" )
+		{
+			diam3.value = value;
+		}
+		else if ( parameter == "h4d" )
+		{
+			diam4.value = value;
+		}
+		else if ( parameter == "h5d" )
+		{
+			diam5.value = value;
+		}
+		else if ( parameter == "h6d" )
+		{
+			diam6.value = value;
+		}
+		else if ( parameter == "pt" )
+		{
+        	ambientTemp.value = value;
+		}
+		else if ( parameter == "ph" )
+		{
+        	humidity.value = value;
+		}
+		else if ( parameter == "tt" )
+		{
+        	ambientTempT.value = value;
+		}
+		else if ( parameter == "th" )
+		{
+        	humidityT.value = value;
+		}
+		else if ( parameter == "fd" )
+		{
+    		flueDepth.value = value;
+		}
+		else if ( parameter == "ft" )
+		{
+    		fippleThickness.value = value;
+		}
+		else if ( parameter == "tf" )
+		{
+    		tshThicknessFactor.value = value;
+		}
+		else if ( parameter == "bf" )
+		{
+    		birdFactor.value = value;
+		}
+		else if ( parameter == "twf" )
+		{
+			TSH_fraction.value = value;
+		}
+		else if ( parameter == "twt" )
+		{
+			if ( value == "0" )
+			{
+				tsh_radio[0].checked = true;
+			}
+			else if ( value == "1" )
+			{
+				tsh_radio[1].checked = true;
+			}
+			else
+			{
+				tsh_radio[2].checked = true;
+			}
+		}
+		else if ( parameter == "sr" )
+		{
+			if ( value == "0" )
+			{
+				ratioType[0].checked = true;
+			}
+			else if ( value == "1" )
+			{
+				ratioType[1].checked = true;
+			}
+			else
+			{
+				ratioType[2].checked = true;
+			}
+		}
+		else if ( parameter == "dr" )
+		{
+        	desiredRatio.value = value;
+		}
+		else if ( parameter == "rw" )
+		{
+        	effectiveWidth1.value = value;
+		}
+		else if ( parameter == "hn" )
+		{
+			keySelect3.selectedIndex = value;
+		}
+		else if ( parameter == "ps" )
+		{
+			standardA4Frequency.value = value;
+			// Need to simulate a "change" in pitch standard so that the default processing
+			// that occurs during this action takes place.
+			pitchStandardChange();
+		}	
+		else if ( parameter == "et" )
+		{
+			switch (value) {
+		
+			case "e": case "y": default:
+				// "y" was used for the "et=" argument prior to v1.38b
+				temperament[0].checked = true;
+				break;
+			
+			case "1": case "n":
+				// "n" was used for "Harmonic" in the "et=" argument prior to v1.38b
+				temperament[1].checked = true;
+				break;
+			
+			case "2":
+				temperament[2].checked = true;
+				break;
+		
+			case "p":
+				temperament[3].checked = true;
+				break;	
+			}
+			
+			// Simulate a "change" in temperament so that the default processing that
+			// occurs during this action takes place.
+
+			temperamentChange();
+			
+		} else if ( parameter == "f1" ) {	
+        	freq1.value = value;
+		} else if ( parameter == "f2" ) {
+        	freq2.value = value;
+		} else if ( parameter == "f3" ) {
+        	freq3.value = value;
+		} else if ( parameter == "f4" ) {
+        	freq4.value = value;
+		} else if ( parameter == "f5" ) {
+        	freq5.value = value;
+		} else if ( parameter == "f6" ) {
+        	freq6.value = value;
+		} else if ( parameter == "fe" ) {
+        	freqEnd.value = value;
+		}
+		else if ( parameter == "ud" )
+		{
+        	useDirHole.checked = value == "y" ? true : false;
+		}
+		else if ( parameter == "dn" )
+		{
+        	dirHoleNum.selectedIndex = value;
+		}
+		else if ( parameter == "df" )
+		{
+        	dirHoleFreq1.value = value;
+		}
+		else if ( parameter == "wh" )
+		{
+        	dirHoleWall.value = value;
+		}
+		else if ( parameter == "hd" )
+		{
+        	dirHoleDiam.value = value;
+		}
+		else if ( parameter == "dv" )
+		{
+			keySelect2.selectedIndex = value;
+			// [was code 68]
+			keyChange2( MIDI_Gs5 - value );
+		}
+		else if ( parameter == "hc" )
+		{
+		/*	VERSION 35 CHANGE: if ( value == "2" )
+			{
+				holeCorrection[2].checked = true;
+			}
+			else if ( value == "1" )
+			{
+				holeCorrection[1].checked = true;
+			}
+			else if ( value == "3" )
+			{
+				holeCorrection[3].checked = true;
+			}
+			else
+			{
+				holeCorrection[0].checked = true;
+			} */
+		}
+	}
+}
+	
+function setArguments()
+{
+	var arguments = location.search;
+	if ( arguments != "" )
+	{
+		arguments = arguments.substr( arguments.indexOf( "?", 0 ) + 1 );
+		if ( arguments != "" )
+		{
+			var pairs = arguments.split( "+" );
+			for ( i in pairs )
+			{
+				var pair = pairs[i].split( "=" );
+				updateValue( pair[0], pair[1] );
+			}
+		}
+	}
+}
+
+</script>
+  
+
+  
+<script type="text/javascript" src="./NAFlutomat - Native American Flute Design Tool_files/AcousticCalcs.js.download"></script>
+  
+
+
+
+<form name="fluteForm" action="https://www.flutopedia.com/start" method="POST">
+ 
+
+
+
+
+
+<h2>Standard 6-hole, Mode 1/4 NAF</h2>
+
+
+
+
+
+<h4>Units of Measurement</h4>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>	
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>
+			Units of Measurement
+			</caption>
+		<tbody><tr><td valign="top">
+		   <p>
+<input type="RADIO" name="units" value="cm" onchange="updateUnitLabels();"> <label for="fp4">
+Metric (°C for temperature, meters/sec for speed, cm for measurements)&nbsp;
+</label> <br>
+<input type="RADIO" name="units" value="inches" onchange="updateUnitLabels();" checked=""> <label for="fp3"> Imperial (°F for temperature, feet/sec for speed,
+inches for measurements) </label>
+</p>
+			</td>
+			</tr>
+			<tr class="fptable2"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Note that changing this selection does not convert the input values<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on this page between Imperial and Metric.</td></tr>
+		</tbody></table></td>
+	</tr>
+</tbody></table>
+
+
+<h4>Environment</h4>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>	
+<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+	<tbody><tr>
+		<th>&nbsp;</th>
+		<th><b>Temperature</b></th>
+		<th><b>Relative Humidity</b></th>
+		<th><b>Speed of Sound</b></th>
+	</tr>
+	<tr>
+		<td>Playing conditions</td>
+		<td valign="middle" align="center"><input type="text" name="ambientTemp" value="72" size="6" class="FormTextInput"><label id="ambientTempLabel">°F</label></td>
+		<td valign="middle" align="center"><input type="text" name="humidity" value="45" size="6" class="FormTextInput"><label id="humidityLabel">%</label></td>
+		<td valign="middle" align="center"><input type="text" name="vsound" size="8" class="FormTextOutput"><label id="vsoundLabel">ft/sec</label></td>
+	</tr>
+	<tr>
+		<td>Tuning conditions</td>
+		<td valign="middle" align="center"><input type="text" name="ambientTempT" value="72" size="6" class="FormTextInput"><label id="ambientTempTLabel">°F</label></td>
+		<td valign="middle" align="center"><input type="text" name="humidityT" value="45" size="6" class="FormTextInput"><label id="humidityTLabel">%</label></td>
+		<td valign="middle" align="center"><input type="text" name="vsoundT" size="8" class="FormTextOutput"><label id="vsoundTLabel">ft/sec</label></td>
+	</tr>
+</tbody></table></td>
+</tr>
+</tbody></table>
+
+<h4>Parameters</h4>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>	
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>Sound Chamber Parameters</caption>
+			<tbody><tr>
+				<td class="NAFlutomatBasic">Inside bore diameter:</td>
+				<td><input type="TEXT" name="bore" value="0.875" size="6" class="FormTextInput"><label id="boreLabel">in</label></td>
+			</tr>
+		</tbody></table>
+		<a href="https://www.flutopedia.com/drill.htm" target="_blank">Drill bit conversions</a> (opens in a new window)</td>
+	</tr>
+</tbody></table>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>TSH Parameters</caption>
+			<tbody><tr>
+				<td>Flue depth</td>
+				<td><input type="TEXT" name="flueDepth" value="0.032" size="6" class="FormTextInput"><label id="flueDepthLabel">in</label></td>
+			</tr>
+			<tr>
+				<td>Cutting edge thickness&nbsp;</td>
+				<td><input type="text" name="fippleThickness" value="0.015" size="6" class="FormTextInput"><label id="fippleThicknessLabel">in</label></td>
+			</tr>
+			<tr>
+				<td>TSH width</td>
+				<td><input type="TEXT" name="widthEmb" value="0.4375" size="6" class="FormTextInput"><label id="widthEmbLabel">in</label></td>
+			</tr>
+			<tr>
+				<td>TSH length (N/S)</td>
+				<td><input name="lenEmb" value="0.1875" size="6" class="FormTextInput"><label id="lenEmbLabel">in</label></td>
+			</tr>
+			<tr>
+				<td>Wall Thickness at TSH</td>
+				<td><input type="TEXT" name="wall" value="0.1875" size="6" class="FormTextInput"><label id="wallLabel">in</label></td>
+			</tr>
+			<tr>
+				<td>TSH factor</td>
+				<td><input type="text" name="tshThicknessFactor" value="1.067" size="6" class="FormTextInput"></td>
+			</tr>
+			<tr>
+				<td>Block/fetish factor</td>
+				<td><input type="text" name="birdFactor" value="0.778" size="6" class="FormTextInput"></td>
+			</tr>
+			<tr>
+				<td>Calculated <span class="expression">k2</span></td>
+				<td><input type="text" name="calck2" size="6" class="FormTextOutput"></td>
+			</tr>
+			<tr>
+				<td>Calculated <span class="expression">k1</span></td>
+				<td><input type="text" name="calck1" size="6" class="FormTextOutput"></td>
+			</tr>
+		</tbody></table>
+		<br>
+
+		<table rules="rows" class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>Design Iterative Calculations</caption>
+			<tbody><tr>
+				<td>
+				<table rules="none" border="0">
+					<tbody><tr>
+						<td>TSH fraction</td>
+						<td><input type="text" value="0.667" name="TSH_fraction" size="6" class="FormTextInput"></td>
+					</tr>
+					<tr>
+						<td>TSH width</td>
+						<td><input type="text" name="TSH_width" size="6" class="FormTextOutput"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center" valign="middle"><input type="button" value="Calculate Bore" onclick="calculateBoreClick()" name="TSH_calc_button1"></td>
+					</tr>
+				</tbody></table>				</td>
+				<td>
+				<table rules="none" border="0">
+					<tbody><tr>
+						<td><input type="radio" value="0" name="tsh_radio"></td>
+						<td>Of bore diameter</td>
+					</tr>
+					<tr>
+						<td><input type="radio" value="1" name="tsh_radio"></td>
+						<td>Of bore width</td>
+					</tr>
+					<tr>
+						<td><input type="radio" checked="true" value="2" name="tsh_radio"></td>
+						<td>Lesser of diameter or width</td>
+					</tr>
+				</tbody></table>				</td>
+			</tr><tr>
+				<td colspan="2" align="center" valign="middle"><input type="button" value="Calculate TSH Factor" name="TSH_factor_calc_button2" onclick="calculateTshFactorClick()"></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center" valign="middle"><input type="button" value="Calculate Block Factor" name="Bird_factor_calc_button2" onclick="calculateBirdFactorClick()"></td>
+			</tr>
+		</tbody></table>
+		</td><td align="left" valign="top">
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>Bore Parameters</caption>
+			<tbody><tr>
+				<td colspan="6" bordercolor="#FFFFFF" height="19"><b>For
+				specified inside bore diameter:</b></td>
+			</tr>
+			<tr>
+				<td align="left">L<sub>theor</sub>/diam <sup> 2 </sup> ratio</td>
+				<td><input type="text" name="actualRatio" size="6" class="FormTextOutput">				</td>
+				<td align="left">L<sub>actual</sub>/diam <sup> 2 </sup>	ratio</td>
+				<td valign="middle" align="center"><input type="text" name="actualRatio2" size="6" class="FormTextOutput"></td>
+				<td valign="middle" align="left">L<sub>actual</sub>/diam ratio</td>
+				<td valign="middle" align="center"><input type="text" name="actualRatio1" size="6" class="FormTextOutput"></td>
+			</tr>
+			<tr class="fptable2">
+				<td colspan="3" align="right">
+				<p><input name="ratioType" type="radio" value="D1"> For
+					L<sub>t</sub>/d<sup>2 </sup> ratio of:<br>
+				<input name="ratioType" type="radio" value="D2"> For
+					L<sub>a</sub>/d<sup>2 </sup> ratio of:<br>
+				<input type="radio" name="ratioType" value="D" checked=""> For
+					L<sub>a</sub>/d ratio of:</p></td>
+				<td colspan="3"><input type="text" name="desiredRatio" value="18.00" size="6" class="FormTextInput"></td>
+			</tr>
+			<tr>
+				<td colspan="2">&nbsp;</td>
+				<th colspan="2">Closest standard router bit diameter</th>
+				<th colspan="2">Your router bit diameter</th>
+			</tr>
+			<tr>
+				<td height="23" colspan="2">Bore width (router bit diameter)</td>
+				<td height="23" colspan="2" align="center" valign="middle"><input type="text" name="effectiveWidth" size="6" class="FormTextOutput"><label id="effectiveWidthLabel">in</label></td>
+				<td colspan="2" align="center" valign="middle"><input type="text" name="effectiveWidth1" value="0.875" size="6" class="FormTextInput"><label id="effectiveWidth1Label">in</label></td>
+			</tr>
+			<tr>
+				<td height="23" colspan="2">Bore height (total bore depth)</td>
+				<td height="23" colspan="2" align="center" valign="middle"><input type="text" name="effectiveHeight" size="6" class="FormTextOutput"><label id="effectiveHeightLabel">in</label></td>
+				<td colspan="2" align="center" valign="middle"><input type="text" name="effectiveHeight1" size="6" class="FormTextOutput"><label id="effectiveHeight1Label">in</label></td>
+			</tr>
+			<tr>
+				<td height="23" colspan="2">Effective inside bore diameter</td>
+				<td height="23" colspan="2" align="center" valign="middle"><input type="text" name="effectiveDiameter" size="6" class="FormTextOutput"><label id="effectiveDiameterLabel">in</label></td>
+				<td colspan="2" align="center" valign="middle"><input type="text" name="effectiveDiameter1" size="6" class="FormTextOutput"><label id="effectiveDiameter1Label">in</label></td>
+			</tr>
+		</tbody></table>
+		<a href="https://www.flutopedia.com/drill.htm" target="_blank">Drill bit conversions</a>
+(opens	in a new window)	<br>
+		&nbsp;<br>
+		<table width="100%" border="0">
+			<tbody><tr valign="top">
+				<td>
+				<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+					<caption>
+					<a href="https://www.flutopedia.com/nodal_interference.htm">Nodal interference</a> and<br>
+					minimum hole size
+					</caption>
+					<tbody><tr>
+						<td>Highest intended note</td>
+						<td align="center"><select name="keySelect3" class="FormSelect">
+							<option>G#7&nbsp;
+							</option><option>G7&nbsp;
+							</option><option>F#7&nbsp;
+							</option><option>F7&nbsp;
+							</option><option>E7&nbsp;
+							</option><option>D#7&nbsp;
+							</option><option>D7&nbsp;
+							</option><option>C#7&nbsp;
+							</option><option>C7&nbsp;
+							</option><option>B6&nbsp;
+							</option><option>A#6&nbsp;
+							</option><option>A6&nbsp;
+							</option><option>G#6&nbsp;
+							</option><option>G6&nbsp;
+							</option><option>F#6&nbsp;
+							</option><option>F6&nbsp;
+							</option><option>E6&nbsp;
+							</option><option>D#6&nbsp;
+							</option><option>D6&nbsp;
+							</option><option>C#6&nbsp;
+							</option><option>C6&nbsp;
+							</option><option selected="">B5&nbsp;
+							</option><option>A#5&nbsp;
+							</option><option>A5&nbsp;
+							</option><option>G#5&nbsp;
+							</option><option>G5&nbsp;
+							</option><option>F#5&nbsp;
+							</option><option>F5&nbsp;
+							</option><option>E5&nbsp;
+							</option><option>D#5&nbsp;
+							</option><option>D5&nbsp;
+							</option><option>C#5&nbsp;
+							</option><option>C5&nbsp;
+							</option><option>B4&nbsp;
+							</option><option>A#4&nbsp;
+							</option><option>A4&nbsp;
+							</option><option>G#4&nbsp;
+							</option><option>G4&nbsp;
+							</option><option>F#4&nbsp;
+							</option><option>F4&nbsp;
+							</option><option>E4&nbsp;
+							</option><option>D#4&nbsp;
+							</option><option>D4&nbsp;
+							</option><option>C#4&nbsp;
+							</option><option>C4&nbsp;
+							</option><option>B3&nbsp;
+							</option><option>A#3&nbsp;
+							</option><option>A3&nbsp;
+							</option><option>G#3&nbsp;
+							</option><option>G3&nbsp;
+							</option><option>F#3&nbsp;
+							</option><option>F3&nbsp;
+							</option><option>E3&nbsp;
+							</option><option>D#3&nbsp;
+							</option><option>D3&nbsp;
+							</option><option>C#3&nbsp;
+							</option><option>C3&nbsp;
+							</option><option>B2&nbsp;
+							</option><option>A#2&nbsp;
+							</option><option>A2&nbsp;
+							</option><option>G#2&nbsp;
+							</option><option>G2&nbsp;
+							</option><option>F#2&nbsp;
+							</option><option>F2&nbsp;
+							</option><option>E2&nbsp;
+							</option><option>D#2&nbsp;
+							</option><option>D2&nbsp;
+						</option></select></td>
+					</tr>
+					<tr>
+						<td>Maximum <span class="expression">k2</span></td>
+						<td height="23" valign="middle" align="center"><input type="text" name="k2max" size="6" class="FormTextOutput"></td>
+					</tr>
+					<tr>
+						<td>Minimum playing hole diameter</td>
+						<td height="23" valign="middle" align="center"><input type="text" name="minHoleSize" size="6" class="FormTextOutput"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="right">The settings and calculations above<br>
+						affect the coloration of the<br>
+						Hole Diameter fields below.</td>
+					</tr>
+				</tbody></table></td>
+				<td align="left" valign="top">
+				<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+					<caption>
+					Note-to-frequency<br>
+					Conversion
+					</caption>
+					<tbody><tr>
+						<td align="left" colspan="3">This calculator is provided for convenience.<br>
+						Settings here are local to this box and<br>
+						do not affect other portions of <span class="NAFlutomat">NAFlutomat</span>.</td>
+					</tr>
+					<tr>
+						<td align="right" bordercolor="#FFFFFF"><select name="keySelect4" class="FormSelect">
+							<option>G#7&nbsp;
+							</option><option>G7&nbsp;
+							</option><option>F#7&nbsp;
+							</option><option>F7&nbsp;
+							</option><option>E7&nbsp;
+							</option><option>D#7&nbsp;
+							</option><option>D7&nbsp;
+							</option><option>C#7&nbsp;
+							</option><option>C7&nbsp;
+							</option><option>B6&nbsp;
+							</option><option>A#6&nbsp;
+							</option><option>A6&nbsp;
+							</option><option>G#6&nbsp;
+							</option><option>G6&nbsp;
+							</option><option>F#6&nbsp;
+							</option><option>F6&nbsp;
+							</option><option>E6&nbsp;
+							</option><option>D#6&nbsp;
+							</option><option>D6&nbsp;
+							</option><option>C#6&nbsp;
+							</option><option>C6&nbsp;
+							</option><option>B5&nbsp;
+							</option><option>A#5&nbsp;
+							</option><option>A5&nbsp;
+							</option><option>G#5&nbsp;
+							</option><option>G5&nbsp;
+							</option><option>F#5&nbsp;
+							</option><option>F5&nbsp;
+							</option><option>E5&nbsp;
+							</option><option>D#5&nbsp;
+							</option><option>D5&nbsp;
+							</option><option>C#5&nbsp;
+							</option><option>C5&nbsp;
+							</option><option>B4&nbsp;
+							</option><option>A#4&nbsp;
+							</option><option>A4&nbsp;
+							</option><option>G#4&nbsp;
+							</option><option>G4&nbsp;
+							</option><option selected="">F#4&nbsp;
+							</option><option>F4&nbsp;
+							</option><option>E4&nbsp;
+							</option><option>D#4&nbsp;
+							</option><option>D4&nbsp;
+							</option><option>C#4&nbsp;
+							</option><option>C4&nbsp;
+							</option><option>B3&nbsp;
+							</option><option>A#3&nbsp;
+							</option><option>A3&nbsp;
+							</option><option>G#3&nbsp;
+							</option><option>G3&nbsp;
+							</option><option>F#3&nbsp;
+							</option><option>F3&nbsp;
+							</option><option>E3&nbsp;
+							</option><option>D#3&nbsp;
+							</option><option>D3&nbsp;
+							</option><option>C#3&nbsp;
+							</option><option>C3&nbsp;
+							</option><option>B2&nbsp;
+							</option><option>A#2&nbsp;
+							</option><option>A2&nbsp;
+							</option><option>G#2&nbsp;
+							</option><option>G2&nbsp;
+							</option><option>F#2&nbsp;
+							</option><option>F2&nbsp;
+							</option><option>E2&nbsp;
+							</option><option>D#2&nbsp;
+							</option><option>D2&nbsp;
+						</option></select></td>
+						<td align="center" bordercolor="#FFFFFF">
+						<table border="0">
+							<tbody><tr class="fptable2">
+								<td><input name="plusMinus" type="radio" value="plus" checked=""> <b>+</b></td>
+							</tr>
+							<tr class="fptable2">
+								<td><input type="radio" name="plusMinus" value="minus">
+								<b>—</b></td>
+							</tr>
+						</tbody></table></td>
+						<td align="left" bordercolor="#FFFFFF"><input name="centOffset" type="text" id="centOffset" size="6" class="FormTextInput">&nbsp;cents</td>
+					</tr>
+					<tr>
+						<td align="right">=&gt;</td>
+						<td><input name="hzValue" type="text" id="hzValue" size="7" class="FormTextOutput">&nbsp;Hz</td>
+						<td align="center" bordercolor="#FFFFFF"><input type="button" name="Button" onclick="transformButClick()" value="Convert"></td>
+					</tr>
+				</tbody></table></td>
+			</tr>
+		</tbody></table>		</td>
+	</tr>
+</tbody></table>
+
+
+<h4>Pitch Standard</h4>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>	
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>Pitch Standard</caption>
+		<tbody><tr>
+		   <td align="center" valign="middle">A4 = <input name="standardA4Frequency" type="text" id="standardA4Frequency" size="6" value="440" class="FormTextInput" onchange="pitchStandardChange();">&nbsp;Hertz (Hz.)</td>
+	        <td align="center">
+			<input name="A4Down" type="button" onclick="A4DownClick();" value="–1" class="NAFlutomatButtonPrev">&nbsp;<input name="A4Up" type="button" onclick="A4UpClick();" value="+1" class="NAFlutomatButtonNext"></td>
+			</tr>
+		</tbody></table>		</td>
+	</tr>
+</tbody></table>
+
+<h4>Temperament</h4>
+
+<table border="0" cellspacing="10">
+	<tbody><tr>
+		<td>	
+		<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+			<caption>Scale Temperament</caption>
+		<tbody><tr><td valign="top">
+			<input type="radio" name="temperament" value="e" onclick="temperamentChange()" checked=""> Equal temperament<br>
+			<input type="radio" name="temperament" value="1" onclick="temperamentChange()"> Harmonic-1 temperament<br>
+			<input type="radio" name="temperament" value="2" onclick="temperamentChange()"> Harmonic-2 temperament<br>
+			<input type="radio" name="temperament" value="p" onclick="temperamentChange()"> Pythagorean temperament
+			</td>
+			<td>Changing the scale temperament<br>
+			adjusts the Playing Frequency<br>
+			values below.
+			</td>
+			</tr>
+		</tbody></table>		</td>
+	</tr>
+</tbody></table>
+
+
+
+<h4>Calculation</h4>
+
+<table width="80%" border="0" cellspacing="10">
+	<tbody><tr>
+		
+		<td valign="middle" align="center"><input name="BUTTON" type="BUTTON" onclick="CalculateButClick();" value="Calculate" class="NAFlutomatButton"><br>
+		<br>
+		<input name="BUTTON" type="BUTTON" onclick="CopyWallButClick();" value="Replicate Hole 6 wall thickness"></td>
+	</tr>
+</tbody></table>
+<br>
+
+<table class="fptable" border="1" cellpadding="4" cellspacing="0">
+	<tbody><tr>
+		<th>Fingering</th>
+		<th>Playing Frequency<br>
+		  (Hz)</th>
+		<th>Tuning Frequency<br>
+		  (Hz)</th>
+		<th>Tuning Note</th>
+		<th><a href="https://www.flutopedia.com/hole_numbering.htm">Hole<br>Number</a></th>
+		<th>Hole diameter</th>
+		<th class="NAFlutomatBasic">Wall thickness<br>at hole</th>
+		<th>Calculated dist.<br>from end of flute</th>
+		<th>Calculated dist.<br>between holes</th>
+	</tr>
+
+	<tr>
+		<td colspan="7" align="right">Total bore length:&nbsp;</td>
+
+		<td align="center"><input name="resultEmb" value="" size="6" class="FormTextOutput"><label id="resultEmbLabel">in</label></td>
+
+		<td align="center">&nbsp;</td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_oox_ooo.gif" width="88" height="20" alt="Finger diagram open open closed open open open" title="Finger diagram &lt;oox|ooo"></td>
+		
+		<td align="left"><input name="freq6" value="739.99" size="7" class="FormTextInput"><label id="ratio6Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq7" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="note7" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">6</td>
+		<td align="center"><input type="TEXT" name="diam6" value="0.30" size="6" class="FormTextInput" style="background-color: rgb(255, 255, 255);"><label id="diam6Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall6" value="0.1875" size="6" class="FormTextInput"><label id="wall6Label">in</label></td>
+
+		<td align="center"><input name="result6" value="" size="6" class="FormTextOutput"><label id="result6Label">in</label></td>
+
+		<td align="left" rowspan="6">
+		<table border="1" cellpadding="4" cellspacing="0">
+			<tbody><tr>
+				<td><input type="text" name="space6" size="6" class="FormTextOutput"><label id="space6Label">in</label></td>
+			</tr>
+			<tr>
+				<td><input type="text" name="space5" size="6" class="FormTextOutput"><label id="space5Label">in</label></td>
+			</tr>
+			<tr>
+				<td><input type="text" name="space4" size="6" class="FormTextOutput"><label id="space4Label">in</label></td>
+			</tr>
+			<tr>
+				<td><input type="text" name="space3" size="6" class="FormTextOutput"><label id="space3Label">in</label></td>
+			</tr>
+			<tr>
+				<td><input type="text" name="space2" size="6" class="FormTextOutput"><label id="space2Label">in</label></td>
+			</tr>
+		</tbody></table>		</td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xox_ooo.gif" width="88" height="20" alt="Finger diagram closed open closed open open open" title="Finger diagram &lt;xox|ooo"></td>
+		
+		<td align="left"><input name="freq5" value="659.26" size="7" class="FormTextInput"><label id="ratio5Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq8" size="7" class="FormTextOutput"></td>
+		<td align="center"><input type="text" name="note8" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">5</td>
+		<td align="center"><input name="diam5" value="0.33" size="6" class="FormTextInput" style="background-color: rgb(255, 255, 255);"><label id="diam5Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall5" value="0.1875" size="6" class="FormTextInput"><label id="wall5Label">in</label></td>
+
+		<td align="center"><input name="result5" value="" size="6" class="FormTextOutput"><label id="result5Label">in</label></td>
+	</tr>
+
+	<tr class="fptable2">
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xxo_xoo.gif" width="88" height="20" alt="Finger diagram closed closed open closed open open" title="Finger diagram &lt;xxo|xoo"></td>
+
+		<td align="left"><input name="freq4" value="587.33" size="7" class="FormTextInput"><label id="ratio4Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq9" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="note9" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">4</td>
+		<td align="center"><input type="TEXT" name="diam4" value="0.30" size="6" class="FormTextInput" style="background-color: rgb(255, 255, 255);"><label id="diam4Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall4" value="0.1875" size="6" class="FormTextInput"><label id="wall4Label">in</label></td>
+
+		<td align="center"><input name="result4" value="" size="6" class="FormTextOutput"><label id="result4Label">in</label></td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xxx_ooo.gif" width="88" height="20" alt="Finger diagram closed closed closed open open open" title="Finger diagram &lt;xxx|ooo"></td>
+
+		<td align="left"><input name="freq3" value="554.37" size="7" class="FormTextInput"><label id="ratio3Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq10" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="note10" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">3</td>
+		<td align="center"><input name="diam3" value="0.32" size="6" class="FormTextInput" style="background-color: rgb(255, 255, 255);"><label id="diam3Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall3" value="0.1875" size="6" class="FormTextInput"><label id="wall3Label">in</label></td>
+
+		<td align="center"><input name="result3" value="" size="6" class="FormTextOutput"><label id="result3Label">in</label></td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xxx_xoo.gif" width="88" height="20" alt="Finger diagram closed closed closed closed open open" title="Finger diagram &lt;xxx|xoo"></td>
+
+		<td align="left"><input name="freq2" value="493.88" size="7" class="FormTextInput"><label id="ratio2Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq11" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="note11" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">2</td>
+		<td align="center"><input type="TEXT" name="diam2" value="0.30" size="6" class="FormTextInput" style="background-color: rgb(245, 255, 245);"><label id="diam2Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall2" value="0.1875" size="6" class="FormTextInput"><label id="wall2Label">in</label></td>
+
+		<td align="center"><input name="result2" value="" size="6" class="FormTextOutput"><label id="result2Label">in</label></td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xxx_xxo.gif" width="88" height="20" alt="Finger diagram closed closed closed closed closed open" title="Finger diagram &lt;xxx|xxo"></td>
+
+		<td align="left"><input name="freq1" value="440.00" size="7" class="FormTextInput"><label id="ratio1Label">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freq12" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="note12" size="11" class="FormTextOutput"></td>
+		<td align="center" class="emphasis">1</td>
+		<td align="center"><input name="diam1" value="0.29" size="6" class="FormTextInput" style="background-color: rgb(255, 221, 221);"><label id="diam1Label">in</label></td>
+
+		<td align="center"><input type="TEXT" name="wall1" value="0.1875" size="6" class="FormTextInput"><label id="wall1Label">in</label></td>
+
+		<td align="center"><input name="result1" value="" size="6" class="FormTextOutput"><label id="result1Label">in</label></td>
+	</tr>
+
+	<tr>
+		<td>
+		<img src="./NAFlutomat - Native American Flute Design Tool_files/NAFTracks_h6mt_xxx_xxx.gif" width="88" height="20" alt="Finger diagram closed closed closed closed closed closed" title="Finger diagram &lt;xxx|xxx"></td>
+
+		<td align="left"><input name="freqEnd" value="369.99" size="7" class="FormTextInput"><label id="ratioEndLabel">&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+
+		<td align="center"><input name="freqEnd1" size="7" class="FormTextOutput"></td>
+
+		<td align="center"><input type="text" name="noteEnd1" class="FormTextOutput" size="11">		</td>
+
+		<td align="left" colspan="5">see <a href="https://www.flutopedia.com/finger_hole_size.htm" target="_blank">Finger Hole Size</a> for hole diameter colors (opens in a new window)</td>
+	</tr>
+
+	<tr class="fptable2">
+		<td align="right" class="NAFlutomatBasic">KEY of FLUTE:</td>
+		
+		<td align="center"><select name="keySelect" class="FormSelect" onchange="keyChange(MIDI_Gs5-this.selectedIndex)">
+							<option>G#5&nbsp;
+							</option><option>G5&nbsp;
+							</option><option>F#5&nbsp;
+							</option><option>F5&nbsp;
+							</option><option>E5&nbsp;
+							</option><option>D#5&nbsp;
+							</option><option>D5&nbsp;
+							</option><option>C#5&nbsp;
+							</option><option>C5&nbsp;
+							</option><option>B4&nbsp;
+							</option><option>A#4&nbsp;
+							</option><option>A4&nbsp;
+							</option><option>G#4&nbsp;
+							</option><option>G4&nbsp;
+							</option><option selected="">F#4&nbsp;
+							</option><option>F4&nbsp;
+							</option><option>E4&nbsp;
+							</option><option>D#4&nbsp;
+							</option><option>D4&nbsp;
+							</option><option>C#4&nbsp;
+							</option><option>C4&nbsp;
+							</option><option>B3&nbsp;
+							</option><option>A#3&nbsp;
+							</option><option>A3&nbsp;
+							</option><option>G#3&nbsp;
+							</option><option>G3&nbsp;
+							</option><option>F#3&nbsp;
+							</option><option>F3&nbsp;
+							</option><option>E3&nbsp;
+							</option><option>D#3&nbsp;
+							</option><option>D3&nbsp;
+							</option><option>C#3&nbsp;
+							</option><option>C3&nbsp;
+							</option><option>B2&nbsp;
+							</option><option>A#2&nbsp;
+							</option><option>A2&nbsp;
+							</option><option>G#2&nbsp;
+							</option><option>G2&nbsp;
+							</option><option>F#2&nbsp;
+							</option><option>F2&nbsp;
+							</option><option>E2&nbsp;
+							</option><option>D#2&nbsp;
+							</option><option>D2&nbsp;
+		</option></select></td>
+
+		<td colspan="7" align="center"><input type="BUTTON" value="Calculate" onclick="CalculateButClick();" class="NAFlutomatButton"></td>
+	</tr>
+</tbody></table>
+<h4>Direction Holes</h4>
+
+<p>Check this box if your wish to have <a href="https://www.flutopedia.com/glossary.htm#Direction_Holes" class="glossary" title="One or more holes nearest the foot end of the flute that are not intended to be covered during normal play." alt="One or more holes nearest the foot end of the flute that are not intended to be covered during normal play.">direction holes</a>:&nbsp;
+  <input type="checkbox" name="useDirHole" value="ON">
+  &nbsp;&nbsp;&nbsp;&nbsp;Number
+  of direction holes:&nbsp; 
+  <select size="1" name="dirHoleNum">
+    <option>1</option>
+    <option>2</option>
+    <option>3</option>
+    <option selected="">4</option>
+  </select>
+  <br>
+  &nbsp;<br>
+</p><table width="80%" class="fptable" border="1" cellpadding="4" cellspacing="0">
+  <tbody><tr>
+   <th align="center" valign="middle" colspan="4"><b>With no direction
+      hole(s) or<br>
+      with direction hole(s) closed …</b></th>
+    
+    <th align="center" rowspan="2">Diameter of<br>direction hole(s)</th>
+    <th align="center" rowspan="2">Wall thickness at<br>direction hole(s)</th>
+    <th align="center" rowspan="2">Calculated distance of<br>direction hole(s)<br>
+      from end of flute</th>
+  </tr>
+  <tr>
+    <th align="center">Tuning Frequency<br>(Hz)</th>
+    <th align="center">Tuning Note</th>
+    <th align="center">Playing Frequency<br>(Hz)</th>
+    <th align="center">Playing Note</th>
+  </tr>
+  <tr>
+    <td align="center"><input type="text" name="dirHoleFreq1" value="349.23" size="7" class="FormTextInput"></td>
+    <td align="center"><input type="text" name="noteDirHole1" size="11" class="FormTextOutput">    </td>
+    <td align="center"><input type="text" name="dirHoleFreq" size="7" class="FormTextOutput"></td>
+    <td align="center"><input type="text" name="noteDirHole" size="11" class="FormTextOutput">    </td>
+    <td align="center"><input type="text" name="dirHoleDiam" value="0.30" size="6" class="FormTextInput"><label id="dirHoleDiamLabel">in</label></td>
+    <td align="center"><input type="text" name="dirHoleWall" value="0.1875" size="6" class="FormTextInput"><label id="dirHoleWallLabel">in</label></td>
+    <td align="center"><input type="text" name="dirHolePos" size="6" class="FormTextOutput"><label id="dirHolePosLabel">in</label></td>
+  </tr>
+  <tr>
+    <td align="center"><select name="keySelect2" class="FormSelect" onchange="keyChange2(MIDI_Gs5-this.selectedIndex)">
+      <option>G#5&nbsp;
+        </option><option>G5&nbsp;
+          </option><option>F#5&nbsp;
+            </option><option>F5&nbsp;
+              </option><option>E5&nbsp;
+                </option><option>D#5&nbsp;
+                  </option><option>D5&nbsp;
+                    </option><option>C#5&nbsp;
+                      </option><option>C5&nbsp;
+                        </option><option>B4&nbsp;
+                        </option><option>A#4&nbsp;
+                        </option><option>A4&nbsp;
+                        </option><option>G#4&nbsp;
+                        </option><option>G4&nbsp;
+                        </option><option>F#4&nbsp;
+                        </option><option selected="">F4&nbsp;
+                        </option><option>E4&nbsp;
+                        </option><option>D#4&nbsp;
+                        </option><option>D4&nbsp;
+                        </option><option>C#4&nbsp;
+                        </option><option>C4&nbsp;
+                        </option><option>B3&nbsp;
+                        </option><option>A#3&nbsp;
+                        </option><option>A3&nbsp;
+                        </option><option>G#3&nbsp;
+                        </option><option>G3&nbsp;
+                        </option><option>F#3&nbsp;
+                        </option><option>F3&nbsp;
+                        </option><option>E3&nbsp;
+                        </option><option>D#3&nbsp;
+                        </option><option>D3&nbsp;
+                        </option><option>C#3&nbsp;
+                        </option><option>C3&nbsp;
+                        </option><option>B2&nbsp;
+                        </option><option>A#2&nbsp;
+                        </option><option>A2&nbsp;
+                        </option><option>G#2&nbsp;
+                        </option><option>G2&nbsp;
+                        </option><option>F#2&nbsp;
+                        </option><option>F2&nbsp;
+                        </option><option>E2&nbsp;
+                        </option><option>D#2&nbsp;
+                        </option><option>D2&nbsp;
+                        </option><option>C#2&nbsp;
+                        </option><option>C2&nbsp;
+                        </option></select></td>
+    <td colspan="6" align="center">&nbsp;</td>
+  </tr>
+</tbody></table>
+<br>
+<table width="100%" border="0">
+	<tbody><tr>
+		<td align="center" valign="bottom"><input name="Reload" type="button" id="Reload" value="Reload with Parameters" onclick="reload()"></td>
+		<td align="center" valign="bottom">
+		<input name="CreateURL" type="button" id="CreateURL" value="Create URL" onclick="createURL()"></td>
+	</tr>
+</tbody></table>
+
+<hr>
+
+
+
+
+
+</form>
+
+
+
+<p></p>
+
+
+ 
+
+
+
+
+
+
+     
+
+      
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+	
+	
+
+	
+	
+
+
+	
+	
+
+
+	
+
+
+
+	
+
+
+	
+
+
+	
+
+
+	
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+      
+	  
+	  </td></tr></tbody></table>
+	</td>
+   
+  </tr>
+  
+  
+  
+  
+
+  
+  
+  
+  
+ 
+  
+  
+</tbody></table>
+
+
+</body></html>
